@@ -1,8 +1,17 @@
 
 #include "core.h"
+#include "MyShapes.h"
+
+using namespace std;
 
 
 // global variables
+mt19937 engine;
+uniform_real_distribution<float> range;
+vector<float>xValues;
+vector<float>yValues;
+
+
 
 // Window size
 const unsigned int initWidth = 512;
@@ -33,6 +42,9 @@ void drawStarOutline();
 void drawStarShaded();
 void drawTank();
 void drawSemiCircleStudio();
+void DrawAdditiveRectangles();
+void DrawThreeRec(float _X, float _Y, float _width, float _height);
+
 
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -84,7 +96,25 @@ int main() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
 	// *** setup viewplane to the appropriate size
-	gluOrtho2D(-1.1f, 1.1f, -1.1f, 1.1f);
+	gluOrtho2D(0, 1000, 0, 1000);
+
+	random_device rd;
+	engine = mt19937(rd());
+	range = uniform_real_distribution<float>(0.0f, 1000.0f);
+
+	xValues = vector<float>(100, 0.0f);
+	yValues = vector<float>(100, 0.0f);
+
+	for (int i = 0; i < 100; i++)
+	{
+		float x = range(engine);
+		float y = range(engine);
+
+		xValues[i] = x;
+		yValues[i] = y;
+
+
+	}
 
 	//
 	// 2. Main loop
@@ -111,173 +141,53 @@ int main() {
 
 
 // renderScene - function to render the current scene
+
+
 void renderScene()
 {
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glPointSize(5.0f);
+	glColor3ub(0, 180, 0);
+	glBegin(GL_POINTS);
+	for (int i = 0; i < 100; i++)
+	{
+
+		glVertex2f(xValues[i], yValues[i]);
+
+		//float x = range(engine);
+		//float y = range(engine);
+
+		//glVertex2f(x, y);
+
+
+	}
+	glEnd();
+
+
 
 	// Render objects here...
 	//drawShadedTriangle();
 	//drawStarOutline();
 	//drawStarShaded();
 	//drawTank();
-	drawSemiCircleStudio();
+	//drawSemiCircleStudio();
+	//DrawAdditiveRectangles();
+
+
+
+
+
 }
 
 // Rendering functions
 
-void drawShadedTriangle() {
 
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(-0.5f, -0.5f);
-	
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(0.0f, 0.5f);
-
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(0.5f, -0.5f);
-
-	glEnd();
-}
-
-void drawStarOutline() {
-
-	glBegin(GL_LINE_LOOP);
-
-	glColor3ub(255, 255, 255);
-	glVertex2f(0.0, 0.25f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.1f, 0.1f);
-
-	glColor3ub(255, 0, 255);
-	glVertex2f(0.25f, 0.08f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(0.15f, -0.05f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(0.25f, -0.25f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(0.0f, -0.125f);
-
-	glColor3ub(231, 170, 25);
-	glVertex2f(-0.25f, -0.25f);
-
-	glColor3ub(128, 200, 0);
-	glVertex2f(-0.15f, -0.05f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(-0.25f, 0.08f);
-
-	glColor3ub(200, 90, 221);
-	glVertex2f(-0.1f, 0.1f);
-
-	glEnd();
-}
-
-void drawStarShaded() {
-
-	glBegin(GL_TRIANGLE_FAN);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.0f, 0.0f); // Centre vertex
-
-	glColor3ub(0, 0, 0);
-	glVertex2f(0.0, 0.25f); // First boundary vertex
-	glVertex2f(0.1f, 0.1f);
-	glVertex2f(0.25f, 0.08f);
-	glVertex2f(0.15f, -0.05f);
-	glVertex2f(0.25f, -0.25f);
-	glVertex2f(0.0f, -0.125f);
-	glVertex2f(-0.25f, -0.25f);
-	glVertex2f(-0.15f, -0.05f);
-	glVertex2f(-0.25f, 0.08f);
-	glVertex2f(-0.1f, 0.1f);
-	glVertex2f(0.0, 0.25f); // Repeat of first boundary vertex to close the loop
-
-	glEnd();
-}
-
-void drawTank() {
-
-	// Render body
-	glBegin(GL_LINE_LOOP);
-
-	glColor3ub(0, 255, 0); // just set colour once as all vertices will keep this unless changed
-	glVertex2f(-0.75f, 0.4f);
-	glVertex2f(0.75f, 0.4f);
-	glVertex2f(0.75f, -0.4f);
-	glVertex2f(-0.75f, -0.4f);
-
-	glEnd();
-
-	// Render gun
-	glBegin(GL_LINE_LOOP);
-
-	glColor3ub(255, 0, 0); // just set colour once as all vertices will keep this unless changed
-	glVertex2f(-0.5f, 0.3f);
-	glVertex2f(0.5f, 0.0f);
-	glVertex2f(-0.5f, -0.3f);
-
-	glEnd();
-}
 
 
 // Draw a semi-circle with smooth shading, with red vertices on the inner edge and yellow vertices on the outer edge.
-void drawSemiCircleStudio() {
 
-	glShadeModel(GL_SMOOTH);
-
-	glBegin(GL_TRIANGLE_STRIP);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.25f, 0.0f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(-0.75f, 0.0f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.216506351f, 0.125f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(-0.649519053f, 0.375f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.125, 0.216506351f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(-0.375f, 0.649519053f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(0.0f, 0.25f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.0f, 0.75f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(0.125f, 0.216506351f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.375f, 0.649519053f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(0.216506351f, 0.125f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.649519053f, 0.375f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(0.25f, 0.0f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(0.75f, 0.0f);
-
-	glEnd();
-}
 
 
 // Function to call when window resized
